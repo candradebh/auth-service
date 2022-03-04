@@ -8,19 +8,19 @@ import javax.persistence.Id;
 import com.sun.istack.NotNull;
 
 @Entity
-public class Usuario  {
+public class User  {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private String nome;
+	private String name;
 	
 	private String email;
 	
-	private String senha;
+	private String password;
 	
-	private boolean ativo;
+	private boolean active;
 	
 	public Long getId() {
 		return id;
@@ -30,14 +30,15 @@ public class Usuario  {
 		this.id = id;
 	}
 	
-	public String getNome() {
-		return nome;
+	
+	public String getName() {
+		return name;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setName(String name) {
+		this.name = name;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -46,23 +47,22 @@ public class Usuario  {
 		this.email = email;
 	}
 
-	public String getSenha() {
-		return senha;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setSenha(String senha) {
-		this.senha = senha;
-	}
-	
-	public boolean isAtivo() {
-		return ativo;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
-	public void setAtivo(boolean ativo) {
-		this.ativo = ativo;
+	public boolean isActive() {
+		return active;
 	}
 
-	
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -80,7 +80,7 @@ public class Usuario  {
 		if(getClass()!= obj.getClass())
 			return false;
 		
-		Usuario other = (Usuario) obj;
+		User other = (User) obj;
 		if(id == null) {
 			if(other.id !=null) {
 				return false;

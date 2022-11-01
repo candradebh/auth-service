@@ -1,7 +1,5 @@
 package com.carlosandrade.microservice.auth;
 
-import java.security.Principal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,8 +10,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.carlosandrade.microservice.auth.model.User;
-import com.carlosandrade.microservice.auth.repository.UserRepository;
+import java.security.Principal;
 
 @SpringBootApplication
 @EnableAuthorizationServer
@@ -24,26 +21,14 @@ public class AuthApplication {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
-	public CommandLineRunner init(@Autowired UserRepository usuarioRepository) {
-		return args -> {
-			User usuario = new User();
-			usuario.setName("Carlos");
-			usuario.setEmail("dev_carlos@outlook.com");
-			usuario.setPassword(passwordEncoder.encode("cm2209"));
-			usuarioRepository.save(usuario);	
-		};
-	}
-	
-	@RequestMapping("/user")
-	public Principal user(Principal user) {
-		return user;
-	}
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(AuthApplication.class, args);
 	}
 
-	
+	@RequestMapping("/user")
+	public Principal user(Principal user) {
+		return user;
+	}
 	
 }

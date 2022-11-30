@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,7 +24,12 @@ public class UserServiceImpl implements UserService {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    public UserEntity createUser(UserEntity userEntity) {
+    public UserEntity createUser(UserEntity userEntity) throws Exception {
+        Optional<UserEntity> user = userRepository.findByEmail(userEntity.getEmail());
+
+        if(user.isPresent()){
+            throw new Exception("O usuário com email " + userEntity.getEmail() + " ja esta cadastrado");
+        }
 
         userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userEntity.getPassword()));
 
@@ -31,16 +37,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntityDto getUserDetailsByEmail(String username) {
-        return userRepository.findByEmail(username);
+    public UserEntity getUserDetailsByEmail(String username) {
+        Optional<UserEntity> userOptional = userRepository.findByEmail(username);
+
+        return userOptional.get();
     }
 
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserEntityDto userEntity = userRepository.findByEmail(username);
-        if (userEntity == null) throw new UsernameNotFoundException(username);
+        Optional<UserEntity> userEntityOptional = userRepository.findByEmail(username);
+
+        if (!userEntityOptional.isPresent()) throw new UsernameNotFoundException(username);
+
+        UserEntity userEntity = userEntityOptional.get();
 
         return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), true, true, true, true, new ArrayList<>());
 
@@ -49,5 +60,15 @@ public class UserServiceImpl implements UserService {
     public Iterable<UserEntity> allUsers() {
         Iterable<UserEntity> users = userRepository.findAll();
         return users;
+    }
+
+    public void delete(Long id) throws Exception {
+
+        Optional<UserEntity> userOptional = userRepository.findById(id);
+
+        if(!userOptional.isPresent()) throw new Exception("O usuário não existe.");
+
+        userRepository.delete(userOptional.get());
+
     }
 }

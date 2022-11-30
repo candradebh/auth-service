@@ -17,6 +17,11 @@ token:
   expiration_time: 864000000
   secret: huhustttsb525353476ttrggsKLKHFHAS
 
-login:
-  url:
-    path: /auth/login
+
+api:
+  login:
+    url:
+      path: /auth/login
+  registration:
+    url:
+      path: /user

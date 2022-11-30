@@ -1,7 +1,7 @@
 package com.carlosandrade.microservice.auth.filter;
 
 import com.carlosandrade.microservice.auth.dto.LoginRequestModel;
-import com.carlosandrade.microservice.auth.dto.UserEntityDto;
+import com.carlosandrade.microservice.auth.model.UserEntity;
 import com.carlosandrade.microservice.auth.services.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,7 +25,6 @@ import java.util.Date;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-
     private Environment environment;
     private UserService userService;
 
@@ -33,10 +32,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         this.environment = environment;
         this.userService = userService;
         super.setAuthenticationManager(authenticationManager);
+
     }
 
+    @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
+
         if (!request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException(
                     "Authentication method not supported: " + request.getMethod());
@@ -56,16 +58,20 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication auth) throws IOException, ServletException {
+
         String username = ((User) auth.getPrincipal()).getUsername();
 
         //se quiser pegar mais dados
         userService.loadUserByUsername(username);
 
-        UserEntityDto userDto = userService.getUserDetailsByEmail(username);
-        String token = Jwts.builder().setSubject(userDto.getEmail()).setExpiration(new Date((System.currentTimeMillis() + Long.parseLong(environment.getProperty("token.expiration_time"))))).signWith(SignatureAlgorithm.HS512, environment.getProperty("token.scret")).compact();
+        UserEntity userEntity = userService.getUserDetailsByEmail(username);
+
+        Date dateExpiration = new Date((System.currentTimeMillis() + Long.parseLong(environment.getProperty("token.expiration_time"))));
+
+        String token = Jwts.builder().setSubject(userEntity.getId().toString()).setExpiration(dateExpiration).signWith(SignatureAlgorithm.HS512, environment.getProperty("token.secret")).compact();
 
         response.addHeader("token", token);
-        response.addHeader("userId", userDto.getId().toString());
+        response.addHeader("userId", userEntity.getId().toString());
     }
 
 }

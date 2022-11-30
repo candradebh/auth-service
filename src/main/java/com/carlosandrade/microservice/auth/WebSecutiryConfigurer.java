@@ -1,41 +1,54 @@
 package com.carlosandrade.microservice.auth;
 
+import com.carlosandrade.microservice.auth.filter.AuthenticationFilter;
+import com.carlosandrade.microservice.auth.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-public class WebSecutiryConfigurer extends WebSecurityConfigurerAdapter{
+@EnableWebSecurity
+public class WebSecutiryConfigurer extends WebSecurityConfigurerAdapter {
 
-	@Override @Bean
-	protected AuthenticationManager authenticationManager() throws Exception {
-		return super.authenticationManager();
-	}
+    private Environment environment;
+    private UserService userService;
 
-	@Override @Bean
-	protected UserDetailsService userDetailsService() {
-		return super.userDetailsService();
-	}
+    private AuthenticationManager authenticationManager;
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Autowired
+    public WebSecutiryConfigurer(Environment environment, UserService userService) {
+        this.environment = environment;
+        this.userService = userService;
+    }
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()
-				.passwordEncoder(passwordEncoder())
-				.withUser("joao")
-				.password(passwordEncoder().encode("joaopwd"))
-				.roles("USER");
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.authorizeRequests().antMatchers("/**")
+                .hasIpAddress(environment.getProperty("gateway.ip"))
+                .and()
+                .addFilter(getAuthenticationFilter());
+        http.headers().frameOptions().disable();
+        //http.authorizeRequests().antMatchers(HttpMethod.POST, "/user/**").hasRole("USER").and().addFilter(getAuthenticationFilter());
+    }
+
+    private AuthenticationFilter getAuthenticationFilter() throws Exception {
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(environment, userService, authenticationManager);
+        return authenticationFilter;
+    }
 
 }
-	
+
 

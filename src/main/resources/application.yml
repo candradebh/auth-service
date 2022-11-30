@@ -1,3 +1,22 @@
+server:
+  port: 8088
 
-server:  port: 8088
-  
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+gateway:
+  ip: 192.168.100.2
+
+token:
+  expiration_time: 864000000
+  secret: huhustttsb525353476ttrggsKLKHFHAS
+
+login:
+  url:
+    path: /auth/login

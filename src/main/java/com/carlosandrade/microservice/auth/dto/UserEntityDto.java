@@ -1,38 +1,25 @@
-package com.carlosandrade.microservice.auth.model;
+package com.carlosandrade.microservice.auth.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
+import java.io.Serializable;
 
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Entity
-@Table(name = "users")
-public class UserEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+public class UserEntityDto implements Serializable {
     private Long id;
-
-    @Column(name = "firstname", nullable = false)
     private String firstName;
-
-    @Column(name = "lastname", nullable = false)
     private String lastName;
-
-    @Column(name = "email", nullable = false)
     private String email;
-
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @Column(name = "encryptedPassword", nullable = true)
     private String encryptedPassword;
+
+    public UserEntityDto() {
+    }
+
+    public UserEntityDto(Long id, String firstName, String lastName, String email, String encryptedPassword) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.encryptedPassword = encryptedPassword;
+    }
 
     public Long getId() {
         return id;
@@ -64,14 +51,6 @@ public class UserEntity {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEncryptedPassword() {

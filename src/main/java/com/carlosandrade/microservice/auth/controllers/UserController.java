@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -15,9 +13,14 @@ public class UserController {
     @Autowired
     UserServiceImpl userService;
 
-    @GetMapping
+   /* @GetMapping
     public Principal user(Principal user) {
         return user;
+    }*/
+
+    @GetMapping
+    public ResponseEntity index() {
+        return ResponseEntity.ok(userService.allUsers());
     }
 
     @PostMapping
@@ -27,5 +30,6 @@ public class UserController {
 
         return ResponseEntity.ok(userCreated);
     }
+
 
 }
